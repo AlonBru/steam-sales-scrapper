@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 
 const getSales = async (term,count=50) => {
   const browser = await puppeteer.launch({
-    // headless: false
+    headless: false
   })
   const page = await browser.newPage()  
   await page.goto('https://store.steampowered.com/search/results?term='+term+'&count='+count)
@@ -83,7 +83,7 @@ const composeAndSend = (games,term) => {
       from: MAIL_FROM,
       to: MAIL_TO,
       subject: 'No sales today',
-      text: 'could not find and sales for term '+term+' and range'+count
+      text: 'could not find and sales for search term '+term+' and range'+count
     };
   }
   return sendMail(mailOptions)
@@ -105,10 +105,10 @@ app.get('/mail',(req,res)=>{
   getAndSend(term,count)
   .then(info=>{
     if (!repeat){
-      res.send(`sent envelope:${JSON.stringify(info.envelope)} for term '${term}'`)
+      res.send(`sent envelope:${JSON.stringify(info.envelope)} for search term '${term}'`)
     }else{
       setInterval(getAndSend,repeat*day,term,count)
-      res.send(`sent envelope:${JSON.stringify(info.envelope)} for term '${term}'.
+      res.send(`sent envelope:${JSON.stringify(info.envelope)} for search term '${term}'.
       setting interval to every ${repeat} days`)
     }
   })
